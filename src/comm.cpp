@@ -1,12 +1,10 @@
 #include "comm.h"
 #include <string.h>
 #include <Arduino.h>
-#include "main.h"
 
 // 初始化串口
 // 返回是否发生错误
 bool serial_init(void) {
-  // Serial2.begin(921600, SERIAL_8N1, 16, 17);
   Serial.begin(921600);
   while (!Serial) delay(1);
   return false;
@@ -35,9 +33,9 @@ bool serial_recv_poll(uint8_t *c) {
 
 // 不同类型的数据包大小
 int comm_payload_size[] = {
-  12, // COMM_TYPE_PING
-  12, // COMM_TYPE_PONG
-  12, // COMM_TYPE_FEEDBACK
+  16, // COMM_TYPE_PING
+  16, // COMM_TYPE_PONG
+  16, // COMM_TYPE_FEEDBACK
 };
 
 // 不能被忽略的数据包
@@ -81,8 +79,7 @@ bool comm_recv_poll(comm_type_t *type, uint8_t payload[]) {
 
     // 无效数据
     if (recv_buf_p == 0 && buf != 0x5A) {
-      err_cnt[0] += 1;
-      // fprintf(stderr, "comm: warning: Received wrong byte!");
+      Serial.println("comm: warning: Received wrong byte!");
       continue;
     }
     recv_buf[recv_buf_p++] = buf;
@@ -93,8 +90,7 @@ bool comm_recv_poll(comm_type_t *type, uint8_t payload[]) {
     // 收到未知类型的数据包
     // assert(recv_buf_p != 2 || recv_buf[1] < (sizeof comm_payload_size) / (sizeof comm_payload_size[0]));
     if (recv_buf_p == 2 && recv_buf[1] >= (sizeof comm_payload_size) / (sizeof comm_payload_size[0])) {
-      err_cnt[1] += 1;
-      // fprintf(stderr, "comm: warning: Received wrong type!");
+      Serial.println("comm: warning: Received wrong type!");
       recv_buf_p = 0; // 重置状态
       continue;
     }
