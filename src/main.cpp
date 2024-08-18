@@ -4,9 +4,6 @@
 #include <lwip/sockets.h>
 
 void setup() {
-  // initialize serial communication at 115200 bits per second:
-  Serial.begin(115200);
-  
   //set the resolution to 12 bits (0-4096)
   analogReadResolution(12);
 
@@ -31,5 +28,5 @@ void loop() {
   for (int i = 0; i < 8; ++i) analog[i] = htons(analog[i]);
   comm_send_blocking(COMM_TYPE_FEEDBACK, (uint8_t *)analog);
 
-  delay(10);
+  delay(100);
 }
